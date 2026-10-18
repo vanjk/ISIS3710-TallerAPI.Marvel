@@ -18,11 +18,12 @@ export class CharactersService {
   async create(createCharacterDto: CreateCharacterDto) {
     const { team_id, ...data } = createCharacterDto;
 
-    // El alias es único -> 409 si ya existe
+    // R2: el alias es único -> 409
     await this.checkAliasAvailable(data.alias);
 
     const character = this.characterRepository.create(data);
     if (team_id !== undefined) {
+      // R4: el equipo debe existir y estar activo
       character.team = await this.findActiveTeam(team_id);
     }
 
@@ -30,10 +31,12 @@ export class CharactersService {
     return this.findOne(saved.id);
   }
 
-  // GET /characters  o  GET /characters?status=ACTIVE
-  async findAll(status?: CharacterStatus) {
+  async findAll(status?: CharacterStatus, teamId?: number) {
     return await this.characterRepository.find({
-      where: status ? { status } : {},
+      where: {
+        ...(status ? { status } : {}),
+        ...(teamId !== undefined ? { team: { id: teamId } } : {}),
+      },
       relations: { team: true },
       order: { id: 'ASC' },
     });
@@ -44,27 +47,47 @@ export class CharactersService {
       where: { id },
       relations: { team: true },
     });
+    // R1: si no existe, entonces 404
     if (!character) throw new NotFoundException(`El personaje con id ${id} no existe`);
     return character;
   }
 
+  // PUT: reemplaza el personaje completo
   async update(id: number, updateCharacterDto: UpdateCharacterDto) {
     const character = await this.findOne(id);
     const { team_id, ...data } = updateCharacterDto;
 
-    if (data.alias && data.alias !== character.alias) {
+    if (data.alias !== character.alias) {
       await this.checkAliasAvailable(data.alias);
     }
 
-    this.characterRepository.merge(character, data);
-    if (team_id !== undefined) {
-      character.team = await this.findActiveTeam(team_id);
-    }
+    // Lo que no venga en el body vuelve a su valor por defecto
+    const newStatus = data.status ?? CharacterStatus.ACTIVE;
+    this.checkStatusTransition(character.status, newStatus);
+
+    character.real_name = data.real_name;
+    character.alias = data.alias;
+    character.main_power = data.main_power;
+    character.power_level = data.power_level;
+    character.status = newStatus;
+    character.is_villain = data.is_villain ?? false;
+    character.team = team_id !== undefined ? await this.findActiveTeam(team_id) : null;
 
     await this.characterRepository.save(character);
     return this.findOne(id);
   }
 
+  // cambia solo el estado
+  async updateStatus(id: number, status: CharacterStatus) {
+    const character = await this.findOne(id); 
+    this.checkStatusTransition(character.status, status);
+
+    character.status = status;
+    await this.characterRepository.save(character);
+    return this.findOne(id);
+  }
+
+  // R1
   async remove(id: number) {
     const character = await this.findOne(id);
     await this.characterRepository.remove(character);
@@ -78,11 +101,19 @@ export class CharactersService {
     if (existing) throw new ConflictException(`Ya existe un personaje con el alias "${alias}"`);
   }
 
-  // Mismo criterio que en teams: el equipo debe existir (404) y estar activo (400)
   private async findActiveTeam(teamId: number) {
     const team = await this.teamRepository.findOne({ where: { id: teamId } });
     if (!team) throw new NotFoundException(`El equipo con id ${teamId} no existe`);
     if (!team.active) throw new BadRequestException('El equipo no está activo');
     return team;
+  }
+
+  // R7: RETIRED no puede pasar directo a INJURED
+  private checkStatusTransition(current: CharacterStatus, next: CharacterStatus) {
+    if (current === CharacterStatus.RETIRED && next === CharacterStatus.INJURED) {
+      throw new BadRequestException(
+        'Un personaje RETIRED no puede pasar directamente a INJURED; primero debe volver a ACTIVE',
+      );
+    }
   }
 }
