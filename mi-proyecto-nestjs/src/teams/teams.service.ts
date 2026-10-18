@@ -20,15 +20,24 @@ export class TeamsService {
     const existingTeam = await this.teamRepository.findOne({ where: { name: createTeamDto.name } });
     if (existingTeam) throw new ConflictException('Ya existe un equipo con ese nombre');
 
-    const newTeam = this.teamRepository.create(createTeamDto);
+        const { characterIds, ...teamData } = createTeamDto;
+
+    // REGLA 5: validar ANTES de guardar, para no dejar el equipo creado si algo falla
+    if (characterIds && characterIds.length > 0) {
+      if (teamData.active === false) throw new BadRequestException('El equipo no está activo');
+      const characters = await this.characterRepository.findBy({ id: In(characterIds) });
+      if (characters.length !== new Set(characterIds).size) {
+        throw new NotFoundException('Uno o varios personajes enviados no existen en la base de datos');
+      }
+    }
+
+    const newTeam = this.teamRepository.create(teamData);
     const savedTeam = await this.teamRepository.save(newTeam);
 
     // Si al crear nos enviaron IDs de personajes, los asignamos
-    if (createTeamDto.characterIds && createTeamDto.characterIds.length > 0) {
-      await this.assignCharacters(savedTeam.id, createTeamDto.characterIds);
+    if (characterIds && characterIds.length > 0) {
+      await this.assignCharacters(savedTeam.id, characterIds);
     }
-
-    return this.findOne(savedTeam.id);
   }
 
   async findAll() {
