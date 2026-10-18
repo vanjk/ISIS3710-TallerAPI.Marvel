@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Put, Patch, Param, Delete, ParseIntPipe } 
 import { TeamsService } from './teams.service.js';
 import { CreateTeamDto } from './dto/create-team.dto.js';
 import { UpdateTeamDto } from './dto/update-team.dto.js';
+import { AssignCharactersDto } from './dto/assign-characters.dto.js';
 
 @Controller('teams')
 export class TeamsController {
@@ -34,10 +35,10 @@ export class TeamsController {
 
   @Patch(':id/characters') // Asigna personajes
   assignCharacters(
-    @Param('id', ParseIntPipe) id: number, 
-    @Body('characterIds') characterIds: number[]
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: AssignCharactersDto
   ) {
-    return this.teamsService.assignCharacters(id, characterIds);
+    return this.teamsService.assignCharacters(id, body.characterIds);
   }
 
   @Delete(':id') // Elimina equipo
