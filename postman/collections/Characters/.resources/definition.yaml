@@ -1,5 +1,0 @@
-$kind: collection
-description: Pruebas del módulo de personajes. Correr en orden (Run collection) con la BD recién cargada.
-variables:
-  baseUrl: http://localhost:3000
-  characterId: "19"
