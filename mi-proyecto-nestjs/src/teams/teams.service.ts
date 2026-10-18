@@ -16,7 +16,7 @@ export class TeamsService {
   ) {}
 
   async create(createTeamDto: CreateTeamDto) {
-    // REGLA 2: No pueden existir dos equipos con el mismo name (409 Conflict)
+    //No pueden existir dos equipos con el mismo name (409 Conflict)
     const existingTeam = await this.teamRepository.findOne({ where: { name: createTeamDto.name } });
     if (existingTeam) throw new ConflictException('Ya existe un equipo con ese nombre');
 
@@ -37,13 +37,13 @@ export class TeamsService {
 
   async findOne(id: number) {
     const team = await this.teamRepository.findOne({ where: { id } });
-    // REGLA 1: Si se consulta un equipo que no existe, responder 404
+    // Si se consulta un equipo que no existe, responder 404
     if (!team) throw new NotFoundException(`El equipo con id ${id} no existe`);
     return team;
   }
 
   async update(id: number, updateTeamDto: UpdateTeamDto) {
-    await this.findOne(id); // Reutilizamos findOne para validar que exista (REGLA 1 - 404)
+    await this.findOne(id); // Reutilizamos findOne para validar que exista
 
     if (updateTeamDto.name) {
       const existingTeam = await this.teamRepository.findOne({ where: { name: updateTeamDto.name } });
@@ -60,7 +60,7 @@ export class TeamsService {
     const team = await this.teamRepository.findOne({ where: { id }, relations: { characters: true } });
     if (!team) throw new NotFoundException(`El equipo con id ${id} no existe`); // REGLA 1
 
-    // REGLA 6: No se puede eliminar un equipo que tenga personajes asociados (409 Conflict)
+    //No se puede eliminar un equipo que tenga personajes asociados
     if (team.characters && team.characters.length > 0) {
       throw new ConflictException('No se puede eliminar un equipo que tenga personajes asociados. Desactívelo mediante PUT (active: false).');
     }
@@ -72,10 +72,10 @@ export class TeamsService {
   async assignCharacters(teamId: number, characterIds: number[]) {
     const team = await this.findOne(teamId); // REGLA 1
 
-    // REGLA 5: El equipo debe estar activo (400 Bad Request)
+    // El equipo debe estar activo (400 Bad Request)
     if (!team.active) throw new BadRequestException('El equipo no está activo');
 
-    // REGLA 5: Todos los personajes enviados deben existir (404 Not Found)
+    // Todos los personajes enviados deben existir (404 Not Found)
     const characters = await this.characterRepository.findBy({ id: In(characterIds) });
     if (characters.length !== characterIds.length) {
       throw new NotFoundException('Uno o varios personajes enviados no existen en la base de datos');
