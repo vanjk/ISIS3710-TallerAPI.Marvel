@@ -1,0 +1,5 @@
+$kind: http-request
+name: GET/Teams
+url: http://localhost:3000/teams
+method: GET
+order: 1792342542747
