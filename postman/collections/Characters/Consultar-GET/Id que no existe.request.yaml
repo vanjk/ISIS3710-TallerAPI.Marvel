@@ -1,0 +1,9 @@
+$kind: http-request
+url: "{{baseUrl}}/characters/999"
+method: GET
+scripts:
+  - type: afterResponse
+    code: pm.test("Responde 404", function () { pm.response.to.have.status(404); });
+    language: text/javascript
+settings: {}
+order: 5000

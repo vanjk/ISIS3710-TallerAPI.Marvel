@@ -1,0 +1,9 @@
+$kind: http-request
+url: "{{baseUrl}}/characters/{{characterId}}"
+method: DELETE
+scripts:
+  - type: afterResponse
+    code: pm.test("Responde 404", function () { pm.response.to.have.status(404); });
+    language: text/javascript
+settings: {}
+order: 2000
