@@ -20,12 +20,19 @@ export class TeamsService {
     const existingTeam = await this.teamRepository.findOne({ where: { name: createTeamDto.name } });
     if (existingTeam) throw new ConflictException('Ya existe un equipo con ese nombre');
 
-    const newTeam = this.teamRepository.create(createTeamDto);
+    const { characterIds, ...teamData } = createTeamDto;
+
+    // REGLA 5: validar ANTES de guardar, para no dejar el equipo creado si algo falla
+    if (characterIds && characterIds.length > 0) {
+      await this.validateAssignment(teamData.active ?? true, characterIds);
+    }
+
+    const newTeam = this.teamRepository.create(teamData);
     const savedTeam = await this.teamRepository.save(newTeam);
 
     // Si al crear nos enviaron IDs de personajes, los asignamos
-    if (createTeamDto.characterIds && createTeamDto.characterIds.length > 0) {
-      await this.assignCharacters(savedTeam.id, createTeamDto.characterIds);
+    if (characterIds && characterIds.length > 0) {
+      await this.assignCharacters(savedTeam.id, characterIds);
     }
 
     return this.findOne(savedTeam.id);
@@ -43,7 +50,7 @@ export class TeamsService {
   }
 
   async update(id: number, updateTeamDto: UpdateTeamDto) {
-    await this.findOne(id); // Reutilizamos findOne para validar que exista
+    const team = await this.findOne(id); // Reutilizamos findOne para validar que exista (REGLA 1 - 404)
 
     if (updateTeamDto.name) {
       const existingTeam = await this.teamRepository.findOne({ where: { name: updateTeamDto.name } });
@@ -52,7 +59,17 @@ export class TeamsService {
       }
     }
 
-    await this.teamRepository.update(id, updateTeamDto);
+    const { characterIds, ...teamData } = updateTeamDto;
+
+    // REGLA 5: validar ANTES de actualizar, para no dejar cambios a medias si algo falla
+    if (characterIds && characterIds.length > 0) {
+      await this.validateAssignment(teamData.active ?? team.active, characterIds);
+    }
+
+    await this.teamRepository.update(id, teamData);
+    if (characterIds && characterIds.length > 0) {
+      await this.assignCharacters(id, characterIds);
+    }
     return this.findOne(id);
   }
 
@@ -72,16 +89,10 @@ export class TeamsService {
   async assignCharacters(teamId: number, characterIds: number[]) {
     const team = await this.findOne(teamId); // REGLA 1
 
-    // El equipo debe estar activo (400 Bad Request)
-    if (!team.active) throw new BadRequestException('El equipo no está activo');
+    // REGLA 5: el equipo debe estar activo (400) y los personajes deben existir (404)
+    const characters = await this.validateAssignment(team.active, characterIds);
 
-    // Todos los personajes enviados deben existir (404 Not Found)
-    const characters = await this.characterRepository.findBy({ id: In(characterIds) });
-    if (characters.length !== characterIds.length) {
-      throw new NotFoundException('Uno o varios personajes enviados no existen en la base de datos');
-    }
-
-    // Guardamos la nueva relación
+    // Guardamos la nueva relación (si ya tenía otro equipo, se reasigna a este)
     for (const char of characters) {
       char.team = team;
       await this.characterRepository.save(char);
@@ -93,5 +104,16 @@ export class TeamsService {
     const team = await this.teamRepository.findOne({ where: { id: teamId }, relations: { characters: true } });
     if (!team) throw new NotFoundException('El equipo no existe');
     return team.characters;
+  }
+
+  // REGLA 5: valida que el equipo esté activo (400) y que todos los personajes existan (404)
+  private async validateAssignment(teamActive: boolean, characterIds: number[]) {
+    if (!teamActive) throw new BadRequestException('El equipo no está activo');
+
+    const characters = await this.characterRepository.findBy({ id: In(characterIds) });
+    if (characters.length !== new Set(characterIds).size) {
+      throw new NotFoundException('Uno o varios personajes enviados no existen en la base de datos');
+    }
+    return characters;
   }
 }
