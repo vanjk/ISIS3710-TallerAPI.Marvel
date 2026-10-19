@@ -1,0 +1,18 @@
+$kind: http-request
+name: PUT/teams
+url: http://localhost:3000/teams/1
+method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \  \"name\": \"Avengers\",\r
+
+    \  \"base\": \"Avengers Vanesa\",\r
+
+    \  \"founded_year\": 1963,\r
+
+    \  \"active\": true\r
+
+    }"
+order: 3402266615721412

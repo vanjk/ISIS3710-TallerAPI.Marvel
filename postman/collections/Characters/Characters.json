@@ -1,0 +1,1054 @@
+{
+  "info": {
+    "_postman_id": "40d3887b-caa4-4e97-b224-0d7877454a69",
+    "name": "Characters",
+    "description": "Pruebas del módulo de personajes según el enunciado. Correr en orden (Run collection).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "41881825"
+  },
+  "item": [
+    {
+      "name": "Consultar/GET",
+      "item": [
+        {
+          "name": "Listar todos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Devuelve una lista\", function () { pm.expect(pm.response.json()).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/characters",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });\npm.test(\"Es Iron Man con su equipo\", function () { const c = pm.response.json(); pm.expect(c.alias).to.eql(\"Iron Man\"); pm.expect(c.team.name).to.eql(\"Avengers\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/characters/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Filtrar por status",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Todos están MISSING\", function () { pm.response.json().forEach(c => pm.expect(c.status).to.eql(\"MISSING\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/characters?status=MISSING",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "MISSING"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Filtrar por teamId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Todos son del equipo 3\", function () { const l = pm.response.json(); pm.expect(l.length).to.be.above(0); l.forEach(c => pm.expect(c.team.id).to.eql(3)); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/characters?teamId=3",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters"
+              ],
+              "query": [
+                {
+                  "key": "teamId",
+                  "value": "3"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Filtrar por status y teamId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"ACTIVE y del equipo 1\", function () { pm.response.json().forEach(c => { pm.expect(c.status).to.eql(\"ACTIVE\"); pm.expect(c.team.id).to.eql(1); }); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/characters?status=ACTIVE&teamId=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "ACTIVE"
+                },
+                {
+                  "key": "teamId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Status inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/characters?status=FOO",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "FOO"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Id que no existe",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/characters/999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters",
+                "999"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Id que no es número",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/characters/abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters",
+                "abc"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Crear/POST",
+      "item": [
+        {
+          "name": "Crear personaje",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", function () { pm.response.to.have.status(201); });\npm.test(\"Guarda el id creado\", function () { pm.collectionVariables.set(\"characterId\", pm.response.json().id); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"real_name\": \"Matt Murdock\",\n  \"alias\": \"Daredevil\",\n  \"main_power\": \"Radar sense\",\n  \"power_level\": 65\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/characters",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear con Alias repetido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 409\", function () { pm.response.to.have.status(409); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"real_name\": \"Matt Murdock\",\n  \"alias\": \"Daredevil\",\n  \"main_power\": \"Radar sense\",\n  \"power_level\": 65\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/characters",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear con Datos inválidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"real_name\": \"Test\",\n  \"alias\": \"Nuevo\",\n  \"main_power\": \"Nada\",\n  \"power_level\": 150,\n  \"status\": \"DEAD\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/characters",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear con Equipo inactivo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"real_name\": \"Bucky Barnes\",\n  \"alias\": \"Winter Soldier\",\n  \"main_power\": \"Bionic arm\",\n  \"power_level\": 70,\n  \"team_id\": 6\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/characters",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear con Equipo que no existe",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"real_name\": \"Bucky Barnes\",\n  \"alias\": \"Winter Soldier\",\n  \"main_power\": \"Bionic arm\",\n  \"power_level\": 70,\n  \"team_id\": 99\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/characters",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reemplazar/PUT",
+      "item": [
+        {
+          "name": "Reemplazar personaje completo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Quedó MISSING en Avengers\", function () { const c = pm.response.json(); pm.expect(c.status).to.eql(\"MISSING\"); pm.expect(c.team.id).to.eql(1); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"real_name\": \"Matt Murdock\",\n  \"alias\": \"Daredevil\",\n  \"main_power\": \"Radar sense\",\n  \"power_level\": 70,\n  \"status\": \"MISSING\",\n  \"team_id\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/characters/{{characterId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters",
+                "{{characterId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Body incompleto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alias\": \"Solo alias\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/characters/{{characterId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters",
+                "{{characterId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Alias de otro personaje",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 409\", function () { pm.response.to.have.status(409); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"real_name\": \"Matt Murdock\",\n  \"alias\": \"Iron Man\",\n  \"main_power\": \"Radar sense\",\n  \"power_level\": 65\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/characters/{{characterId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters",
+                "{{characterId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Equipo inactivo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"real_name\": \"Matt Murdock\",\n  \"alias\": \"Daredevil\",\n  \"main_power\": \"Radar sense\",\n  \"power_level\": 65,\n  \"team_id\": 6\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/characters/{{characterId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters",
+                "{{characterId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Personaje que no existe",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"real_name\": \"Matt Murdock\",\n  \"alias\": \"Daredevil\",\n  \"main_power\": \"Radar sense\",\n  \"power_level\": 65\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/characters/999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters",
+                "999"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Cambiar Estado/PATCH",
+      "item": [
+        {
+          "name": "Cambiar a RETIRED",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Quedó RETIRED\", function () { pm.expect(pm.response.json().status).to.eql(\"RETIRED\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"RETIRED\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/characters/{{characterId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters",
+                "{{characterId}}",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "RETIRED a INJURED",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"INJURED\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/characters/{{characterId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters",
+                "{{characterId}}",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "RETIRED a ACTIVE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });\npm.test(\"Quedó ACTIVE\", function () { pm.expect(pm.response.json().status).to.eql(\"ACTIVE\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACTIVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/characters/{{characterId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters",
+                "{{characterId}}",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ACTIVE a INJURED",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"INJURED\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/characters/{{characterId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters",
+                "{{characterId}}",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Status inválido -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"DEAD\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/characters/{{characterId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters",
+                "{{characterId}}",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Personaje que no existe -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACTIVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/characters/999/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters",
+                "999",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Eliminar/DELETE",
+      "item": [
+        {
+          "name": "Eliminar personaje creado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/characters/{{characterId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters",
+                "{{characterId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar otra vez",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/characters/{{characterId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "characters",
+                "{{characterId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "characterId",
+      "value": "19"
+    }
+  ]
+}

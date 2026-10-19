@@ -1,0 +1,5 @@
+$kind: http-request
+name: DELETE/Teams
+url: http://localhost:3000/teams/7
+method: DELETE
+order: 4466684647038687

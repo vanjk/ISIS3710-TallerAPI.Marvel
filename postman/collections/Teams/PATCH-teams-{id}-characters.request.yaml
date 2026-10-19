@@ -1,0 +1,12 @@
+$kind: http-request
+name: PATCH/teams/{id}/characters
+url: http://localhost:3000/teams/1/characters
+method: PATCH
+body:
+  type: json
+  content: "{\r
+
+    \  \"characterIds\": [1, 2]\r
+
+    }\r\n"
+order: 4393931166908974
