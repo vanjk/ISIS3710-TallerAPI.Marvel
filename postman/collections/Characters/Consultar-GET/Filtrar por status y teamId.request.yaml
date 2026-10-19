@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{baseUrl}}/characters?status=ACTIVE&teamId=1"
+method: GET
+queryParams:
+  status: ACTIVE
+  teamId: "1"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Responde 200", function () { pm.response.to.have.status(200); });
+      pm.test("ACTIVE y del equipo 1", function () { pm.response.json().forEach(c => { pm.expect(c.status).to.eql("ACTIVE"); pm.expect(c.team.id).to.eql(1); }); });
+    language: text/javascript
+settings: {}
+order: 5000

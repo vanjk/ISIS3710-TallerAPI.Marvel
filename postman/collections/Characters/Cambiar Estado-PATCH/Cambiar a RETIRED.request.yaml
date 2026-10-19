@@ -1,0 +1,19 @@
+$kind: http-request
+url: "{{baseUrl}}/characters/{{characterId}}/status"
+method: PATCH
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "status": "RETIRED"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Responde 200", function () { pm.response.to.have.status(200); });
+      pm.test("Quedó RETIRED", function () { pm.expect(pm.response.json().status).to.eql("RETIRED"); });
+    language: text/javascript
+settings: {}
+order: 1000

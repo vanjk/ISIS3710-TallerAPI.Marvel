@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{baseUrl}}/characters/{{characterId}}/status"
+method: PATCH
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "status": "INJURED"
+    }
+scripts:
+  - type: afterResponse
+    code: pm.test("Responde 400", function () { pm.response.to.have.status(400); });
+    language: text/javascript
+settings: {}
+order: 2000

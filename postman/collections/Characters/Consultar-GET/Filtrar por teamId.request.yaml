@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/characters?teamId=3"
+method: GET
+queryParams:
+  teamId: "3"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Responde 200", function () { pm.response.to.have.status(200); });
+      pm.test("Todos son del equipo 3", function () { const l = pm.response.json(); pm.expect(l.length).to.be.above(0); l.forEach(c => pm.expect(c.team.id).to.eql(3)); });
+    language: text/javascript
+settings: {}
+order: 4000

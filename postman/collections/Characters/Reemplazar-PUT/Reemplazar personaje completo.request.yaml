@@ -1,0 +1,24 @@
+$kind: http-request
+url: "{{baseUrl}}/characters/{{characterId}}"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "real_name": "Matt Murdock",
+      "alias": "Daredevil",
+      "main_power": "Radar sense",
+      "power_level": 70,
+      "status": "MISSING",
+      "team_id": 1
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Responde 200", function () { pm.response.to.have.status(200); });
+      pm.test("Quedó MISSING en Avengers", function () { const c = pm.response.json(); pm.expect(c.status).to.eql("MISSING"); pm.expect(c.team.id).to.eql(1); });
+    language: text/javascript
+settings: {}
+order: 1000
