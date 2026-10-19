@@ -1,0 +1,20 @@
+$kind: http-request
+url: "{{baseUrl}}/characters/{{characterId}}"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "real_name": "Matt Murdock",
+      "alias": "Iron Man",
+      "main_power": "Radar sense",
+      "power_level": 65
+    }
+scripts:
+  - type: afterResponse
+    code: pm.test("Responde 409", function () { pm.response.to.have.status(409); });
+    language: text/javascript
+settings: {}
+order: 3000

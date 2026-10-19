@@ -1,0 +1,18 @@
+$kind: http-request
+name: Personaje que no existe -> 404
+url: "{{baseUrl}}/characters/999/status"
+method: PATCH
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "status": "ACTIVE"
+    }
+scripts:
+  - type: afterResponse
+    code: pm.test("Responde 404", function () { pm.response.to.have.status(404); });
+    language: text/javascript
+settings: {}
+order: 6000

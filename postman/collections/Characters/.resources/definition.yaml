@@ -1,0 +1,5 @@
+$kind: collection
+description: Pruebas del módulo de personajes según el enunciado. Correr en orden (Run collection).
+variables:
+  baseUrl: http://localhost:3000
+  characterId: "19"

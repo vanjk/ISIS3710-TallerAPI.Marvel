@@ -1,0 +1,11 @@
+$kind: http-request
+url: "{{baseUrl}}/characters/1"
+method: GET
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Responde 200", function () { pm.response.to.have.status(200); });
+      pm.test("Es Iron Man con su equipo", function () { const c = pm.response.json(); pm.expect(c.alias).to.eql("Iron Man"); pm.expect(c.team.name).to.eql("Avengers"); });
+    language: text/javascript
+settings: {}
+order: 2000

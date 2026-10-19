@@ -1,0 +1,20 @@
+$kind: http-request
+url: "{{baseUrl}}/characters/999"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "real_name": "Matt Murdock",
+      "alias": "Daredevil",
+      "main_power": "Radar sense",
+      "power_level": 65
+    }
+scripts:
+  - type: afterResponse
+    code: pm.test("Responde 404", function () { pm.response.to.have.status(404); });
+    language: text/javascript
+settings: {}
+order: 5000
