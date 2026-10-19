@@ -1,0 +1,5 @@
+$kind: http-request
+name: GET/teams/{id}/characters
+url: http://localhost:3000/teams/1/characters
+method: GET
+order: 3488599602955839

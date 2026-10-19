@@ -1,0 +1,18 @@
+$kind: http-request
+name: POST/teams
+url: http://localhost:3000/teams
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"name\": \"VanesaMagic\",\r
+
+    \  \"base\": \"Avengers Tower\",\r
+
+    \  \"founded_year\": 1961,\r
+
+    \  \"active\": true\r
+
+    }"
+order: 49401286570206
